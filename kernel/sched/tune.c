@@ -948,5 +948,5 @@ schedtune_init(void)
 
 	return 0;
 }
-late_initcall(schedtune_init);
+postcore_initcall(schedtune_init);
 
