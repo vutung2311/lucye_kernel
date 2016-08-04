@@ -285,7 +285,6 @@ static int cpufreq_sched_policy_init(struct cpufreq_policy *policy)
 		  __func__, gd->up_throttle_nsec);
 
 	policy->governor_data = gd;
-	gd->max = policy->max;
 
 	rc = sysfs_create_group(get_governor_parent_kobj(policy), get_sysfs_attr());
 	if (rc) {
@@ -345,6 +344,21 @@ static int cpufreq_sched_start(struct cpufreq_policy *policy)
 		per_cpu(enabled, cpu) = 1;
 
 	return 0;
+}
+
+static void cpufreq_sched_limits(struct cpufreq_policy *policy)
+{
+	unsigned int clamp_freq;
+	struct gov_data *gd = policy->governor_data;;
+
+	pr_debug("limit event for cpu %u: %u - %u kHz, currently %u kHz\n",
+		policy->cpu, policy->min, policy->max,
+		policy->cur);
+
+	clamp_freq = clamp(gd->requested_freq, policy->min, policy->max);
+
+	if (policy->cur != clamp_freq)
+		__cpufreq_driver_target(policy, clamp_freq, CPUFREQ_RELATION_L);
 }
 
 static int cpufreq_sched_stop(struct cpufreq_policy *policy)
