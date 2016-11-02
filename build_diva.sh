@@ -7,7 +7,6 @@ export BUILD_JOB_NUMBER=`nproc`
 export KBUILD_BUILD_USER=BuildUser
 export KBUILD_BUILD_HOST=BuildHost
 export KERNEL_ROOT=$(pwd)
-export KERNEL_COMPRESSION_SUFFIX=gz
 
 RDIR=${KERNEL_ROOT}
 KERNEL_DEFCONFIG=lucye_nao_us-perf_defconfig
