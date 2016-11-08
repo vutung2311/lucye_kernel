@@ -124,6 +124,7 @@ static int32_t msm_cci_set_clk_param(struct cci_device *cci_dev,
 			__func__, __LINE__, i2c_freq_mode);
 		return -EINVAL;
 	}
+
 	if (cci_dev->i2c_freq_mode[master] == i2c_freq_mode)
 		return 0;
 
