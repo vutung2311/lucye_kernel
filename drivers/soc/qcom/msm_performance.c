@@ -2273,6 +2273,11 @@ static struct notifier_block perf_cputransitions_nb = {
 	.notifier_call = perf_cputrans_notify,
 };
 
+struct cpu_pwr_stats __weak *get_cpu_pwr_stats(void)
+{
+	return NULL;
+}
+
 /*
  * Attempt to offline CPUs based on their power cost.
  * CPUs with higher power costs are offlined first.

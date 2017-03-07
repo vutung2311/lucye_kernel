@@ -120,7 +120,7 @@ void ecryptfs_msg_ctx_alloc_to_free(struct ecryptfs_msg_ctx *msg_ctx)
 int ecryptfs_find_daemon_by_euid(struct ecryptfs_daemon **daemon)
 {
 	int rc;
-	printk(KERN_ERR "sdp::current euid:%u\n", current_euid());
+	printk(KERN_ERR "sdp::current euid:%u\n", current_euid().val);
 	hlist_for_each_entry(*daemon,
 #ifndef CONFIG_SDP
 			    &ecryptfs_daemon_hash[ecryptfs_current_euid_hash()],
@@ -128,7 +128,7 @@ int ecryptfs_find_daemon_by_euid(struct ecryptfs_daemon **daemon)
 			    &ecryptfs_daemon_hash[ecryptfs_sdp_euid_hash()],
 #endif
 			    euid_chain) {
-		printk(KERN_ERR "sdp::file euid:%u, current euid:%u\n", (*daemon)->file->f_cred->euid, current_euid());
+		printk(KERN_ERR "sdp::file euid:%u, current euid:%u\n", (*daemon)->file->f_cred->euid.val, current_euid().val);
 #ifndef CONFIG_SDP
 		if (uid_eq((*daemon)->file->f_cred->euid, current_euid())) {
 #else
