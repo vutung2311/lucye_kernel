@@ -11,6 +11,98 @@
 
 unsigned int sysctl_sched_cfs_boost __read_mostly;
 
+/*
+ * System energy normalization constants
+ */
+static struct target_nrg {
+	unsigned long min_power;
+	unsigned long max_power;
+	struct reciprocal_value rdiv;
+} schedtune_target_nrg;
+
+/* Performance Boost region (B) threshold params */
+static int perf_boost_idx;
+
+/* Performance Constraint region (C) threshold params */
+static int perf_constrain_idx;
+
+/**
+ * Performance-Energy (P-E) Space thresholds constants
+ */
+struct threshold_params {
+	int nrg_gain;
+	int cap_gain;
+};
+
+/*
+ * System specific P-E space thresholds constants
+ */
+static struct threshold_params
+threshold_gains[] = {
+	{ 0, 4 }, /* >=  0% */
+	{ 0, 4 }, /* >= 10% */
+	{ 1, 4 }, /* >= 20% */
+	{ 2, 4 }, /* >= 30% */
+	{ 3, 4 }, /* >= 40% */
+	{ 4, 3 }, /* >= 50% */
+	{ 4, 2 }, /* >= 60% */
+	{ 4, 1 }, /* >= 70% */
+	{ 4, 0 }, /* >= 80% */
+	{ 4, 0 }  /* >= 90% */
+};
+
+static int
+__schedtune_accept_deltas(int nrg_delta, int cap_delta,
+			  int perf_boost_idx, int perf_constrain_idx)
+{
+	int payoff = -INT_MAX;
+
+	/* Performance Boost (B) region */
+	if (nrg_delta > 0 && cap_delta > 0) {
+		/*
+		 * Evaluate "Performance Boost" vs "Energy Increase"
+		 * payoff criteria:
+		 *    cap_delta / nrg_delta < cap_gain / nrg_gain
+		 * which is:
+		 *    nrg_delta * cap_gain > cap_delta * nrg_gain
+		 */
+		payoff  = nrg_delta * threshold_gains[perf_boost_idx].cap_gain;
+		payoff -= cap_delta * threshold_gains[perf_boost_idx].nrg_gain;
+
+		trace_sched_tune_filter(
+				nrg_delta, cap_delta,
+				threshold_gains[perf_boost_idx].nrg_gain,
+				threshold_gains[perf_boost_idx].cap_gain,
+				payoff, 8);
+
+		return payoff;
+	}
+
+	/* Performance Constraint (C) region */
+	if (nrg_delta < 0 && cap_delta < 0) {
+		/*
+		 * Evaluate "Performance Boost" vs "Energy Increase"
+		 * payoff criteria:
+		 *    cap_delta / nrg_delta > cap_gain / nrg_gain
+		 * which is:
+		 *    cap_delta * nrg_gain > nrg_delta * cap_gain
+		 */
+		payoff  = cap_delta * threshold_gains[perf_constrain_idx].nrg_gain;
+		payoff -= nrg_delta * threshold_gains[perf_constrain_idx].cap_gain;
+
+		trace_sched_tune_filter(
+				nrg_delta, cap_delta,
+				threshold_gains[perf_constrain_idx].nrg_gain,
+				threshold_gains[perf_constrain_idx].cap_gain,
+				payoff, 6);
+
+		return payoff;
+	}
+
+	/* Default: reject schedule candidate */
+	return payoff;
+}
+
 #ifdef CONFIG_CGROUP_SCHEDTUNE
 
 /*
@@ -58,6 +150,37 @@ static struct schedtune
 root_schedtune = {
 	.boost	= 0,
 };
+
+int
+schedtune_accept_deltas(int nrg_delta, int cap_delta,
+			struct task_struct *task)
+{
+	struct schedtune *ct;
+	int perf_boost_idx;
+	int perf_constrain_idx;
+
+	/* Optimal (O) region */
+	if (nrg_delta < 0 && cap_delta > 0) {
+		trace_sched_tune_filter(nrg_delta, cap_delta, 0, 0, 1, 0);
+		return INT_MAX;
+	}
+
+	/* Suboptimal (S) region */
+	if (nrg_delta > 0 && cap_delta < 0) {
+		trace_sched_tune_filter(nrg_delta, cap_delta, 0, 0, -1, 5);
+		return -INT_MAX;
+	}
+
+	/* Get task specific perf Boost/Constraints indexes */
+	rcu_read_lock();
+	ct = task_schedtune(task);
+	perf_boost_idx = ct->perf_boost_idx;
+	perf_constrain_idx = ct->perf_constrain_idx;
+	rcu_read_unlock();
+
+	return __schedtune_accept_deltas(nrg_delta, cap_delta,
+			perf_boost_idx, perf_constrain_idx);
+}
 
 /*
  * Maximum number of boost groups to support
@@ -413,6 +536,28 @@ struct cgroup_subsys schedtune_cgrp_subsys = {
 	.legacy_cftypes	= files,
 	.early_init	= 1,
 };
+
+#else /* CONFIG_CGROUP_SCHEDTUNE */
+
+int
+schedtune_accept_deltas(int nrg_delta, int cap_delta,
+			struct task_struct *task)
+{
+	/* Optimal (O) region */
+	if (nrg_delta < 0 && cap_delta > 0) {
+		trace_sched_tune_filter(nrg_delta, cap_delta, 0, 0, 1, 0);
+		return INT_MAX;
+	}
+
+	/* Suboptimal (S) region */
+	if (nrg_delta > 0 && cap_delta < 0) {
+		trace_sched_tune_filter(nrg_delta, cap_delta, 0, 0, -1, 5);
+		return -INT_MAX;
+	}
+
+	return __schedtune_accept_deltas(nrg_delta, cap_delta,
+			perf_boost_idx, perf_constrain_idx);
+}
 
 #endif /* CONFIG_CGROUP_SCHEDTUNE */
 
