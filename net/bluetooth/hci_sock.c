@@ -977,7 +977,7 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
 
 		if (((ogf > HCI_SFLT_MAX_OGF) ||
 		     !hci_test_bit(ocf & HCI_FLT_OCF_BITS,
-				   &hci_sec_filter.ocf_mask[ogf])) &&
+				   (void*) &hci_sec_filter.ocf_mask[ogf])) &&
 		    !capable(CAP_NET_RAW)) {
 			err = -EPERM;
 			goto drop;
