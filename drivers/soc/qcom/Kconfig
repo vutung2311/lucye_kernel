@@ -360,7 +360,7 @@ menuconfig MSM_SCM_XPU
 
 if MSM_SCM_XPU
 
-choice
+choice MSM_XPU_VIOLATION_BEHAVIOR
 	prompt "XPU Violation Behavior"
 	default MSM_XPU_ERR_FATAL
 

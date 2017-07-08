@@ -3,13 +3,13 @@
 # default feature list
 ######################
 
-DHDCFLAGS += -Wall -Wstrict-prototypes -Dlinux -DLINUX -DBCMDRIVER            \
+DHDCFLAGS += -Wall -Wstrict-prototypes -Wno-tautological-compare -Dlinux -DLINUX -DBCMDRIVER            \
         -DBCMDONGLEHOST -DUNRELEASEDCHIP -DBCMDMA32 -DBCMFILEIMAGE            \
         -DDHDTHREAD -DSHOW_EVENTS -DBCMDBG -DWLP2P                            \
         -DWIFI_ACT_FRAME -DARP_OFFLOAD_SUPPORT                                \
         -DKEEP_ALIVE -DCSCAN -DPKT_FILTER_SUPPORT                             \
         -DEMBEDDED_PLATFORM -DPNO_SUPPORT -DREAD_CONFIG_FROM_FILE             \
-	-DSEC_ENHANCEMENT
+        -DSEC_ENHANCEMENT
 
 #####################
 # Bus Interface Type
