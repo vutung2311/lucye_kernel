@@ -205,7 +205,7 @@ static int ext_watch_get_position(struct device *dev, char *buf, int *len)
 	loglen = snprintf(log, 256,
 		"Get Offset[%X] Zero Display[%d], 24H Mode[%d], Clock Mode[%d]\n",
 		d->reg_info.r_aod_spi_addr + EXT_WATCH_STATUS,
-        position.zero_disp, position.h24_en,
+		position.zero_disp, position.h24_en,
 		position.clock_disp_mode);
 	memcpy(&buf[*len], log, loglen);
 	*len += loglen;
@@ -642,11 +642,11 @@ static int ext_watch_font_dump(struct device *dev, char *font_dump)
 	mutex_lock(&ts->lock);
 	TOUCH_I("%s start\n", __func__);
 
-    value = 1;
-    ret = sw49407_reg_write(dev, EXT_WATCH_FONT_DN_FLAG,
-        (u8*)&value, sizeof(u32));
-    if (ret)
-        goto error;
+	value = 1;
+	ret = sw49407_reg_write(dev, EXT_WATCH_FONT_DN_FLAG,
+		(u8*)&value, sizeof(u32));
+	if (ret)
+		goto error;
 
 	remained = d->watch.font_written_size;
 

@@ -2476,8 +2476,10 @@ static int rescale_monotonic_soc (int msoc, struct fg_chip *chip)
 	if (msoc > 0)
 #ifdef CONFIG_LGE_PM_BATT_PROFILE //0xF5 96% -> 100% rescaling
 #ifdef CONFIG_LGE_PM_CYCLE_BASED_CHG_VOLTAGE
+	{
 		rescale_threshold = chip->batt_scale_criteria - (chip->rescale_offset);
 		capacity = (((msoc - 1) * (FULL_CAPACITY - 2))*100/(rescale_threshold - 2)) + 100;
+	}
 #else
 		capacity = (((msoc - 1) * (FULL_CAPACITY - 2))*100/(chip->batt_scale_criteria - 2)) + 100;
 #endif

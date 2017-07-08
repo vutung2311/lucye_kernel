@@ -6,9 +6,10 @@ export BUILD_CROSS_COMPILE=$HOME/opt/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-elf
 export BUILD_JOB_NUMBER=`nproc`
 export KBUILD_BUILD_USER=BuildUser
 export KBUILD_BUILD_HOST=BuildHost
-export PRIVATE_RCMS_NAME=PERFUME_WHL_N70_SENSE80GP_SPCS
+export KERNEL_ROOT=$(pwd)
+export KERNEL_COMPRESSION_SUFFIX=gz
 
-RDIR=$(pwd)
+RDIR=${KERNEL_ROOT}
 KERNEL_DEFCONFIG=lucye_nao_us-perf_defconfig
 
 FUNC_BUILD_KERNEL()

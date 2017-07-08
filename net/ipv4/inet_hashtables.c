@@ -34,7 +34,7 @@ static u32 inet_ehashfn(const struct net *net, const __be32 laddr,
 	net_get_random_once(&inet_ehash_secret, sizeof(inet_ehash_secret));
 
 	return __inet_ehashfn(laddr, lport, faddr, fport,
-			      inet_ehash_secret + net_hash_mix(net));
+				  inet_ehash_secret + net_hash_mix(net));
 }
 
 /* This function handles inet_sock, but also timewait and request sockets
@@ -44,14 +44,14 @@ u32 sk_ehashfn(const struct sock *sk)
 {
 #if IS_ENABLED(CONFIG_IPV6)
 	if (sk->sk_family == AF_INET6 &&
-	    !ipv6_addr_v4mapped(&sk->sk_v6_daddr))
+		!ipv6_addr_v4mapped(&sk->sk_v6_daddr))
 		return inet6_ehashfn(sock_net(sk),
-				     &sk->sk_v6_rcv_saddr, sk->sk_num,
-				     &sk->sk_v6_daddr, sk->sk_dport);
+					 &sk->sk_v6_rcv_saddr, sk->sk_num,
+					 &sk->sk_v6_daddr, sk->sk_dport);
 #endif
 	return inet_ehashfn(sock_net(sk),
-			    sk->sk_rcv_saddr, sk->sk_num,
-			    sk->sk_daddr, sk->sk_dport);
+				sk->sk_rcv_saddr, sk->sk_num,
+				sk->sk_daddr, sk->sk_dport);
 }
 
 /*
@@ -90,7 +90,7 @@ void inet_bind_bucket_destroy(struct kmem_cache *cachep, struct inet_bind_bucket
 }
 
 void inet_bind_hash(struct sock *sk, struct inet_bind_bucket *tb,
-		    const unsigned short snum)
+			const unsigned short snum)
 {
 	struct inet_hashinfo *hashinfo = sk->sk_prot->h.hashinfo;
 
@@ -119,15 +119,15 @@ static void __inet_put_port(struct sock *sk)
 	tb = inet_csk(sk)->icsk_bind_hash;
 	__sk_del_bind_node(sk);
 /* 2015-08-13 jewon.lee@lge.com LGP_DATA_KERNEL_CRASHFIX_TCP_NUKE_ADDR [START] */
-    if (tb)
+	if (tb)
 /* 2015-08-13 jewon.lee@lge.com LGP_DATA_KERNEL_CRASHFIX_TCP_NUKE_ADDR [END] */
-        tb->num_owners--;
+		tb->num_owners--;
 	inet_csk(sk)->icsk_bind_hash = NULL;
 	inet_sk(sk)->inet_num = 0;
 /* 2015-08-13 jewon.lee@lge.com LGP_DATA_KERNEL_CRASHFIX_TCP_NUKE_ADDR [START] */
-    if (tb)
+	if (tb)
 /* 2015-08-13 jewon.lee@lge.com LGP_DATA_KERNEL_CRASHFIX_TCP_NUKE_ADDR [END] */
-	inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, tb);
+		inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, tb);
 	spin_unlock(&head->lock);
 }
 
@@ -158,12 +158,12 @@ int __inet_inherit_port(struct sock *sk, struct sock *child)
 		 * create a new bind bucket for the child here. */
 		inet_bind_bucket_for_each(tb, &head->chain) {
 			if (net_eq(ib_net(tb), sock_net(sk)) &&
-			    tb->port == port)
+				tb->port == port)
 				break;
 		}
 		if (!tb) {
 			tb = inet_bind_bucket_create(table->bind_bucket_cachep,
-						     sock_net(sk), head, port);
+							 sock_net(sk), head, port);
 			if (!tb) {
 				spin_unlock(&head->lock);
 				return -ENOMEM;
@@ -211,10 +211,10 @@ static inline int compute_score(struct sock *sk, struct net *net,
 
 
 struct sock *__inet_lookup_listener(struct net *net,
-				    struct inet_hashinfo *hashinfo,
-				    const __be32 saddr, __be16 sport,
-				    const __be32 daddr, const unsigned short hnum,
-				    const int dif)
+					struct inet_hashinfo *hashinfo,
+					const __be32 saddr, __be16 sport,
+					const __be32 daddr, const unsigned short hnum,
+					const int dif)
 {
 	struct sock *sk, *result;
 	struct hlist_nulls_node *node;
@@ -235,7 +235,7 @@ begin:
 			reuseport = sk->sk_reuseport;
 			if (reuseport) {
 				phash = inet_ehashfn(net, daddr, hnum,
-						     saddr, sport);
+							 saddr, sport);
 				matches = 1;
 			}
 		} else if (score == hiscore && reuseport) {
@@ -302,7 +302,7 @@ begin:
 		if (sk->sk_hash != hash)
 			continue;
 		if (likely(INET_MATCH(sk, net, acookie,
-				      saddr, daddr, ports, dif))) {
+					  saddr, daddr, ports, dif))) {
 			if (unlikely(!atomic_inc_not_zero(&sk->sk_refcnt)))
 				goto out;
 			if (unlikely(!INET_MATCH(sk, net, acookie,
@@ -330,8 +330,8 @@ EXPORT_SYMBOL_GPL(__inet_lookup_established);
 
 /* called with local bh disabled */
 static int __inet_check_established(struct inet_timewait_death_row *death_row,
-				    struct sock *sk, __u16 lport,
-				    struct inet_timewait_sock **twp)
+					struct sock *sk, __u16 lport,
+					struct inet_timewait_sock **twp)
 {
 	struct inet_hashinfo *hinfo = death_row->hashinfo;
 	struct inet_sock *inet = inet_sk(sk);
@@ -513,9 +513,9 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
 			 */
 			inet_bind_bucket_for_each(tb, &head->chain) {
 				if (net_eq(ib_net(tb), net) &&
-				    tb->port == port) {
+					tb->port == port) {
 					if (tb->fastreuse >= 0 ||
-					    tb->fastreuseport >= 0)
+						tb->fastreuseport >= 0)
 						goto next_port;
 					WARN_ON(hlist_empty(&tb->owners));
 					if (!check_established(death_row, sk,
@@ -583,7 +583,7 @@ out:
  * Bind a port for a connect operation and hash it.
  */
 int inet_hash_connect(struct inet_timewait_death_row *death_row,
-		      struct sock *sk)
+			  struct sock *sk)
 {
 	return __inet_hash_connect(death_row, sk, inet_sk_port_offset(sk),
 				   __inet_check_established);
@@ -598,7 +598,7 @@ void inet_hashinfo_init(struct inet_hashinfo *h)
 	for (i = 0; i < INET_LHTABLE_SIZE; i++) {
 		spin_lock_init(&h->listening_hash[i].lock);
 		INIT_HLIST_NULLS_HEAD(&h->listening_hash[i].head,
-				      i + LISTENING_NULLS_BASE);
+					  i + LISTENING_NULLS_BASE);
 		}
 }
 EXPORT_SYMBOL_GPL(inet_hashinfo_init);
@@ -618,7 +618,7 @@ int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
 		nblocks = min(nblocks, hashinfo->ehash_mask + 1);
 
 		hashinfo->ehash_locks =	kmalloc_array(nblocks, size,
-						      GFP_KERNEL | __GFP_NOWARN);
+							  GFP_KERNEL | __GFP_NOWARN);
 		if (!hashinfo->ehash_locks)
 			hashinfo->ehash_locks = vmalloc(nblocks * size);
 
