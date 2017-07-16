@@ -28,7 +28,7 @@ on post-fs-data
 #LGVPN 3.4
 on post-fs
     mkdir /data/misc/vpnclientd 0770 system system
-    insmod /sbin/lgecrypto_module.ko
+    insmod /system/lib/modules/lgecrypto_module.ko
 
 service vpnclientd /system/bin/vpnclientd
     class main
