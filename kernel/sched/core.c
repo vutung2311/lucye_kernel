@@ -781,8 +781,6 @@ void sched_avg_update(struct rq *rq)
 	}
 }
 
-#ifdef CONFIG_SCHED_HMP
-
 /*
  * Note C-state for (idle) cpus.
  *
@@ -2202,8 +2200,6 @@ void wake_up_new_task(struct task_struct *p)
 	struct rq *rq;
 
 	raw_spin_lock_irqsave(&p->pi_lock, flags);
-	init_new_task_load(p);
-	add_new_task_to_grp(p);
 #ifdef CONFIG_SMP
 	/*
 	 * Fork balancing, do it here and not earlier because:
@@ -7085,8 +7081,6 @@ void __init sched_init_smp(void)
 	hotcpu_notifier(sched_domains_numa_masks_update, CPU_PRI_SCHED_ACTIVE);
 	hotcpu_notifier(cpuset_cpu_active, CPU_PRI_CPUSET_ACTIVE);
 	hotcpu_notifier(cpuset_cpu_inactive, CPU_PRI_CPUSET_INACTIVE);
-
-	update_cluster_topology();
 
 	init_hrtick();
 
