@@ -2,7 +2,7 @@
 # kernel build script by Tkkg1994 v0.5 (optimized from apq8084 kernel source)
 
 export ARCH=arm64
-export BUILD_CROSS_COMPILE=$HOME/opt/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-elf/bin/aarch64-elf-
+export BUILD_CROSS_COMPILE=$HOME/opt/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-elf/bin/aarch64-elf-
 export BUILD_JOB_NUMBER=`nproc`
 export KBUILD_BUILD_USER=BuildUser
 export KBUILD_BUILD_HOST=BuildHost
