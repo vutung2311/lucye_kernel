@@ -58,8 +58,8 @@ rm -rf ./build.log
 	START_TIME=`date +%s`
 
 	FUNC_BUILD_KERNEL
-	#FUNC_BUILD_RAMDISK
-	#FUNC_BUILD_ZIP
+	FUNC_BUILD_RAMDISK
+	FUNC_BUILD_ZIP
 
 	END_TIME=`date +%s`
 	
