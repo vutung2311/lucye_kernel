@@ -1,0 +1,182 @@
+diff --git a/arch/arm64/configs/lucye_tmo_us-perf_defconfig b/arch/arm64/configs/lucye_tmo_us-perf_defconfig
+index 76295e2..8a3c6b8 100644
+--- a/arch/arm64/configs/lucye_tmo_us-perf_defconfig
++++ b/arch/arm64/configs/lucye_tmo_us-perf_defconfig
+@@ -786,3 +786,13 @@ CONFIG_BT_V4L2=y
+ #CONFIG_FM_V4L2 is not set
+ #CONFIG_ANT_V4L2 is not set
+ CONFIG_LGE_PANEL_RECOVERY=y
++CONFIG_USB_HOST_NOTIFY=y
++# ADDITIONAL OPTIONS - START
++CONFIG_SCSI_UFSHCD=y
++CONFIG_SCSI_UFSHCD_PLATFORM=y
++CONFIG_SCSI_UFS_QCOM=y
++CONFIG_SCSI_UFS_QCOM_ICE=y
++CONFIG_UFS_LGE_FEATURE=y
++CONFIG_UFS_LGE_CARD_RESET=y
++# ADDITIONAL OPTIONS - END
++CONFIG_QCOM_SMCINVOKE=y
+diff --git a/drivers/net/ethernet/msm/rndis_ipa_trace.h b/drivers/net/ethernet/msm/rndis_ipa_trace.h
+index c0fc573..1e8dd9a 100644
+--- a/drivers/net/ethernet/msm/rndis_ipa_trace.h
++++ b/drivers/net/ethernet/msm/rndis_ipa_trace.h
+@@ -77,5 +77,5 @@ TRACE_EVENT(
+ 
+ /* This part must be outside protection */
+ #undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
++#define TRACE_INCLUDE_PATH ../../drivers/net/ethernet/msm/
+ #include <trace/define_trace.h>
+diff --git a/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h b/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h
+index d70abdf..5c9a43f 100644
+--- a/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h
++++ b/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h
+@@ -131,5 +131,5 @@ TRACE_EVENT(
+ 
+ /* This part must be outside protection */
+ #undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
++#define TRACE_INCLUDE_PATH ../../drivers/platform/msm/ipa/ipa_v2/
+ #include <trace/define_trace.h>
+diff --git a/drivers/soc/qcom/tracer_pkt_private.h b/drivers/soc/qcom/tracer_pkt_private.h
+index fc760e6..79e0bd3 100644
+--- a/drivers/soc/qcom/tracer_pkt_private.h
++++ b/drivers/soc/qcom/tracer_pkt_private.h
+@@ -15,7 +15,7 @@
+ #undef TRACE_SYSTEM
+ #define TRACE_SYSTEM tracer_pkt
+ #undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
++#define TRACE_INCLUDE_PATH ../../drivers/soc/qcom
+ #undef TRACE_INCLUDE_FILE
+ #define TRACE_INCLUDE_FILE tracer_pkt_private
+ 
+diff --git a/drivers/usb/gadget/function/f_gsi.c b/drivers/usb/gadget/function/f_gsi.c
+index 380f62f..0901437 100644
+--- a/drivers/usb/gadget/function/f_gsi.c
++++ b/drivers/usb/gadget/function/f_gsi.c
+@@ -18,7 +18,7 @@
+ #include <linux/ipa_usb.h>
+ #include "f_gsi.h"
+ #include "rndis.h"
+-#include "debug.h"
++#include "../debug.h"
+ 
+ static unsigned int gsi_in_aggr_size;
+ module_param(gsi_in_aggr_size, uint, S_IRUGO | S_IWUSR);
+diff --git a/drivers/usb/gadget/function/f_midi.c b/drivers/usb/gadget/function/f_midi.c
+index 9baa3b7..860dae9 100644
+--- a/drivers/usb/gadget/function/f_midi.c
++++ b/drivers/usb/gadget/function/f_midi.c
+@@ -32,7 +32,7 @@
+ #include <linux/usb/audio.h>
+ #include <linux/usb/midi.h>
+ 
+-#include "u_f.h"
++#include "../u_f.h"
+ 
+ MODULE_AUTHOR("Ben Williamson");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/usb/gadget/function/f_mtp.c b/drivers/usb/gadget/function/f_mtp.c
+index 5a30be9..f674ecf 100644
+--- a/drivers/usb/gadget/function/f_mtp.c
++++ b/drivers/usb/gadget/function/f_mtp.c
+@@ -40,7 +40,7 @@
+ #include <linux/configfs.h>
+ #include <linux/usb/composite.h>
+ 
+-#include "configfs.h"
++#include "../configfs.h"
+ 
+ #define MTP_RX_BUFFER_INIT_SIZE    1048576
+ #define MTP_BULK_BUFFER_SIZE       16384
+diff --git a/drivers/usb/gadget/function/f_rndis.c b/drivers/usb/gadget/function/f_rndis.c
+index 8798a46..1d89e30 100644
+--- a/drivers/usb/gadget/function/f_rndis.c
++++ b/drivers/usb/gadget/function/f_rndis.c
+@@ -27,7 +27,7 @@
+ #include "u_ether_configfs.h"
+ #include "u_rndis.h"
+ #include "rndis.h"
+-#include "configfs.h"
++#include "../configfs.h"
+ 
+ /*
+  * This function is an RNDIS Ethernet port -- a Microsoft protocol that's
+diff --git a/drivers/usb/misc/tusb422/lge/hw_pd_dev.h b/drivers/usb/misc/tusb422/lge/hw_pd_dev.h
+index 190840a..f34352b 100644
+--- a/drivers/usb/misc/tusb422/lge/hw_pd_dev.h
++++ b/drivers/usb/misc/tusb422/lge/hw_pd_dev.h
+@@ -1,7 +1,7 @@
+ #ifndef __HW_PD_DEV_H__
+ #define __HW_PD_DEV_H__
+ 
+-#include "tusb422_linux.h"
++#include "../tusb422_linux.h"
+ 
+ #include <linux/kernel.h>
+ #include <linux/device.h>
+diff --git a/firmware/analogix/mi1_eeprom_20_8b.img b/firmware/analogix/mi1_eeprom_20_8b.img
+deleted file mode 100644
+index db0c4b3..0000000
+Binary files a/firmware/analogix/mi1_eeprom_20_8b.img and /dev/null differ
+diff --git a/firmware/anx7418/ocm_crc_08.bin b/firmware/anx7418/ocm_crc_08.bin
+deleted file mode 100644
+index f20971e..0000000
+Binary files a/firmware/anx7418/ocm_crc_08.bin and /dev/null differ
+diff --git a/firmware/anx7418/ocm_hamming_13.bin b/firmware/anx7418/ocm_hamming_13.bin
+deleted file mode 100644
+index 225f5ee..0000000
+Binary files a/firmware/anx7418/ocm_hamming_13.bin and /dev/null differ
+diff --git a/include/linux/sysfs.h b/include/linux/sysfs.h
+index f97d0db..e88da7d 100644
+--- a/include/linux/sysfs.h
++++ b/include/linux/sysfs.h
+@@ -452,7 +452,7 @@ static inline void sysfs_notify_dirent(struct kernfs_node *kn)
+ }
+ 
+ static inline struct kernfs_node *sysfs_get_dirent(struct kernfs_node *parent,
+-						   const unsigned char *name)
++						   const char *name)
+ {
+ 	return kernfs_find_and_get(parent, name);
+ }
+diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
+index cec9740..5207fed 100644
+--- a/sound/soc/msm/apq8096-auto.c
++++ b/sound/soc/msm/apq8096-auto.c
+@@ -32,7 +32,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ 
+ #define DRV_NAME "apq8096-auto-asoc-snd"
+diff --git a/sound/soc/msm/apq8096-i2c.c b/sound/soc/msm/apq8096-i2c.c
+index 57ddcdf..a9ae434 100644
+--- a/sound/soc/msm/apq8096-i2c.c
++++ b/sound/soc/msm/apq8096-i2c.c
+@@ -31,7 +31,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ #include "../codecs/wcd9xxx-common.h"
+ #include "../codecs/wcd9330.h"
+diff --git a/sound/soc/msm/msm8996.c b/sound/soc/msm/msm8996.c
+index 6ad8a8c..f5a3dc4 100644
+--- a/sound/soc/msm/msm8996.c
++++ b/sound/soc/msm/msm8996.c
+@@ -31,7 +31,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ #include "../codecs/wcd9xxx-common.h"
+ #include "../codecs/wcd9330.h"
