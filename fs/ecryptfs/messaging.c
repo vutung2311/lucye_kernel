@@ -37,7 +37,7 @@ static int ecryptfs_hash_bits;
 #ifdef CONFIG_SDP
 #define SDP_EUID 1000
 #define ecryptfs_sdp_euid_hash(uid) \
-	hash_long((unsigned long)from_kuid(&init_user_ns, SDP_EUID), ecryptfs_hash_bits)
+	hash_long((unsigned long)SDP_EUID, ecryptfs_hash_bits)
 #endif
 
 static u32 ecryptfs_msg_counter;
@@ -132,7 +132,7 @@ int ecryptfs_find_daemon_by_euid(struct ecryptfs_daemon **daemon)
 #ifndef CONFIG_SDP
 		if (uid_eq((*daemon)->file->f_cred->euid, current_euid())) {
 #else
-		if (uid_eq((*daemon)->file->f_cred->euid, SDP_EUID)) {
+		if ((*daemon)->file->f_cred->euid.val == SDP_EUID) {
 #endif
 			rc = 0;
 			goto out;

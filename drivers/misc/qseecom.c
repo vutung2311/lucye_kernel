@@ -1996,7 +1996,6 @@ static int __qseecom_reentrancy_process_incomplete_cmd(
 		} else {
 			status  = QSEOS_RESULT_SUCCESS;
 		}
-<<<<<<< HEAD
 		table = ptr_svc->sglistinfo_ptr;
 		if (qseecom.qsee_version < QSEE_VERSION_40) {
 			send_data_rsp.listener_id  = lstnr;
@@ -2025,17 +2024,6 @@ static int __qseecom_reentrancy_process_incomplete_cmd(
 		else
 			*(uint32_t *)cmd_buf =
 				QSEOS_LISTENER_DATA_RSP_COMMAND_WHITELIST;
-		if (ptr_svc)
-			msm_ion_do_cache_op(qseecom.ion_clnt, ptr_svc->ihandle,
-					ptr_svc->sb_virt, ptr_svc->sb_length,
-						ION_IOC_CLEAN_INV_CACHES);
-
-		if (lstnr == RPMB_SERVICE)
-			__qseecom_enable_clk(CLK_QSEE);
-=======
-
-		send_data_rsp.qsee_cmd_id = QSEOS_LISTENER_DATA_RSP_COMMAND;
-		send_data_rsp.listener_id  = lstnr;
 		if (ptr_svc) {
 			ret = msm_ion_do_cache_op(qseecom.ion_clnt,
 				ptr_svc->ihandle, ptr_svc->sb_virt,
@@ -2050,7 +2038,6 @@ static int __qseecom_reentrancy_process_incomplete_cmd(
 			if (ret)
 				return ret;
 		}
->>>>>>> 30e549a... qseecom: fix incomplete error handling for several functions
 
 		ret = qseecom_scm_call(SCM_SVC_TZSCHEDULER, 1,
 					cmd_buf, cmd_len, resp, sizeof(*resp));

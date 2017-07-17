@@ -75,7 +75,7 @@ int sdp_set_curret_user(uid_t user_id)
 {
 	struct sdp_user *user, *prev_user;
 	struct sdp_storage *storage;
-	uid_t uid = current_uid();
+	uid_t uid = current_uid().val;
 	if (uid != 1000 && uid != 0) {
 		SDP_LOGE("Setting sdp user is not permitted:uid(%d)\n", uid);
 		return -1;
@@ -114,7 +114,7 @@ int sdp_user_add(uid_t user_id)
 	struct sdp_user *user;
 	struct sdp_user *tmp_user;
     uid_t uid;
-    uid = current_uid();
+    uid = current_uid().val;
     if (uid != 1000 && uid != 0) {
         SDP_LOGE("Adding sdp user is not permitted:uid(%d)\n", uid);
         return -1;
@@ -156,7 +156,7 @@ int sdp_user_del(uid_t user_id)
 {
 	struct sdp_user *user, *next_user;
 	struct sdp_storage *tmp_storage, *next;
-	uid_t uid = current_uid();
+	uid_t uid = current_uid().val;
 	if (uid != 1000 && uid != 0) {
 		SDP_LOGE("Deleting sdp user is not permitted:uid(%d)\n", uid);
 		return -1;
@@ -241,7 +241,7 @@ int sdp_storage_del(int user_id, int storage_id) {
 int sdp_storage_lock(struct sdp_user *user, int storage_id)
 {
 	struct sdp_storage *tmp_storage;
-	uid_t uid = current_uid();
+	uid_t uid = current_uid().val;
 	if (uid != 1000 && uid != 0) {
 		SDP_LOGE("Locking sdp user is not permitted:uid(%d)\n", uid);
 		return -1;
@@ -263,7 +263,7 @@ int sdp_storage_lock(struct sdp_user *user, int storage_id)
 int sdp_storage_unlock(struct sdp_user *user, int storage_id, struct sdp_key *key)
 {
 	struct sdp_storage *tmp_storage;
-	uid_t uid = current_uid();
+	uid_t uid = current_uid().val;
 	if (uid != 1000 && uid != 0) {
 		SDP_LOGE("Locking sdp user is not permitted:uid(%d)\n", uid);
 		return -1;
@@ -1783,11 +1783,11 @@ err:
 }
 
 static int is_root(void) {
-	return (current_uid() == 0) ? 1 : 0;
+	return (current_uid().val == 0) ? 1 : 0;
 }
 
 static int is_system(void) {
-	return (current_uid() == 1000) ? 1 : 0;
+	return (current_uid().val == 1000) ? 1 : 0;
 }
 
 static long sdp_ioctl_ctl(struct file *file,
@@ -1799,9 +1799,9 @@ static long sdp_ioctl_ctl(struct file *file,
 		SDP_LOGE("Current process info :: "
 				"uid=%u gid=%u euid=%u egid=%u suid=%u sgid=%u "
 				"fsuid=%u fsgid=%u\n",
-				current_uid(), current_gid(), current_euid(),
-				current_egid(), current_suid(), current_sgid(),
-				current_fsuid(), current_fsgid());
+				current_uid().val, current_gid().val, current_euid().val,
+				current_egid().val, current_suid().val, current_sgid().val,
+				current_fsuid().val, current_fsgid().val);
 		SDP_LOGD("Access denied to evt device");
 		return -EACCES;
 	}

@@ -440,7 +440,7 @@ static int cpufreq_sched_start(struct cpufreq_policy *policy)
 	return 0;
 }
 
-static void cpufreq_sched_limits(struct cpufreq_policy *policy)
+static int cpufreq_sched_limits(struct cpufreq_policy *policy)
 {
 	unsigned int clamp_freq;
 	struct gov_data *gd = policy->governor_data;;
@@ -453,6 +453,8 @@ static void cpufreq_sched_limits(struct cpufreq_policy *policy)
 
 	if (policy->cur != clamp_freq)
 		__cpufreq_driver_target(policy, clamp_freq, CPUFREQ_RELATION_L);
+
+	return 0;
 }
 
 static int cpufreq_sched_stop(struct cpufreq_policy *policy)
@@ -478,6 +480,7 @@ static int cpufreq_sched_setup(struct cpufreq_policy *policy,
 	case CPUFREQ_GOV_STOP:
 		return cpufreq_sched_stop(policy);
 	case CPUFREQ_GOV_LIMITS:
+		return cpufreq_sched_limits(policy);
 		break;
 	}
 	return 0;
