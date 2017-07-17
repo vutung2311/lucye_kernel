@@ -36,10 +36,13 @@ modules.builtin
 Module.symvers
 *.dwo
 ipa_common
+include/config/
+generated/
 build/boot.img
 build/kernel_package.zip
 ramdisk/ramdisk-new.cpio.gz
 ramdisk/split_img/boot.img-zImage
+*.log
 
 #
 # Top-level generic files
