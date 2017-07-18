@@ -61,6 +61,11 @@ ramdisk/split_img/boot.img-zImage
 /debian/
 
 #
+# A .ko file from LG that we need
+#
+!/ramdisk/ramdisk/sbin/lgecrypto_module.ko
+
+#
 # git files that we don't want to ignore even it they are dot-files
 #
 !.gitignore

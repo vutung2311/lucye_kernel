@@ -1138,12 +1138,17 @@ static unsigned long maybe_relocated(unsigned long crc,
 static int check_version(Elf_Shdr *sechdrs,
 			 unsigned int versindex,
 			 const char *symname,
-			 struct module *mod, 
+			 struct module *mod,
 			 const unsigned long *crc,
 			 const struct module *crc_owner)
 {
 	unsigned int i, num_versions;
 	struct modversion_info *versions;
+
+	/* Allow loading of proprietary kernel modules */
+	if (!strncmp("lgecrypto_", mod->name, 10))
+ 		return 1;
+
 
 	/* Exporting module didn't supply crcs?  OK, we're already tainted. */
 	if (!crc)
@@ -1207,7 +1212,7 @@ static inline int same_magic(const char *amagic, const char *bmagic,
 static inline int check_version(Elf_Shdr *sechdrs,
 				unsigned int versindex,
 				const char *symname,
-				struct module *mod, 
+				struct module *mod,
 				const unsigned long *crc,
 				const struct module *crc_owner)
 {
@@ -3235,7 +3240,7 @@ out:
 
 static int unknown_module_param_cb(char *param, char *val, const char *modname)
 {
-	/* Check for magic 'dyndbg' arg */ 
+	/* Check for magic 'dyndbg' arg */
 	int ret = ddebug_dyndbg_module_param_cb(param, val, modname);
 	if (ret != 0)
 		pr_warn("%s: unknown parameter '%s' ignored\n", modname, param);
