@@ -338,7 +338,7 @@ static int32_t msm_sensor_fill_ois_subdevid_by_name(
 	return rc;
 }
 
-#ifdef CONFIG_MACH_LGE
+#ifdef CONFIG_LGE_CAMERA_DRIVER
 static int32_t msm_sensor_fill_tcs_subdevid_by_name(
 				struct msm_sensor_ctrl_t *s_ctrl)
 {
@@ -1037,7 +1037,7 @@ CSID_TG:
 	s_ctrl->sensordata->eeprom_name = slave_info->eeprom_name;
 	s_ctrl->sensordata->actuator_name = slave_info->actuator_name;
 	s_ctrl->sensordata->ois_name = slave_info->ois_name;
-#ifdef CONFIG_MACH_LGE
+#ifdef CONFIG_LGE_CAMERA_DRIVER
 	s_ctrl->sensordata->proxy_name = slave_info->proxy_name;
 	s_ctrl->sensordata->tcs_name = slave_info->tcs_name;
 	s_ctrl->sensordata->iris_name = slave_info->iris_name;
@@ -1065,7 +1065,7 @@ CSID_TG:
 		goto free_camera_info;
 	}
 
-#ifdef CONFIG_MACH_LGE
+#ifdef CONFIG_LGE_CAMERA_DRIVER
 	rc = msm_sensor_fill_tcs_subdevid_by_name(s_ctrl);
 	if (rc < 0) {
 		pr_err("%s failed %d\n", __func__, __LINE__);
