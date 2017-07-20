@@ -369,9 +369,9 @@ on post-fs-data
 # change preload directory permission for movetosd about preload app
     start chmod_dp
 
-on post-fs
+#on post-fs
 # Support tuxera exfat filesystem
-    insmod /system/lib/modules/texfat.ko
+#    insmod /system/lib/modules/texfat.ko
 
 # change preload directory permission for movetosd about preload app
 service chmod_dp /system/bin/sh /system/etc/change_permission_preload.sh
