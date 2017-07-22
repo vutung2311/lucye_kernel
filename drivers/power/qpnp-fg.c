@@ -3111,7 +3111,7 @@ static int update_sram_data(struct fg_chip *chip, int *resched_ms)
 #ifdef CONFIG_MACH_MSM8996_LUCYE
 			temp_for_vint_err = twos_compliment_extend(temp, 3);
 			chip->vint_err_pct = div64_s64(temp_for_vint_err * 10000, FULL_PERCENT_3B);
-			pr_info("vint err raw %d\n", chip->vint_err_pct);
+			pr_debug("vint err raw %d\n", chip->vint_err_pct);
 #endif
 
 			temp = twos_compliment_extend(temp, fg_data[i].len);
