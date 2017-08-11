@@ -13,5 +13,5 @@ service pkmd /system/bin/pkmd
     socket pkmd stream 0660 root system
     seclabel u:r:pkmd:s0
 
-on property:init.svc.atd=running
+on property:init.svc.atd=running && property:ro.boot.verifiedbootstate=green
     start pkmd

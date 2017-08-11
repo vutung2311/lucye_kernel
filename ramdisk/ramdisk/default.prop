@@ -33,7 +33,7 @@ ro.lge.fmframework.enabled=true
 #
 # BOOTIMAGE_BUILD_PROPERTIES
 #
-ro.bootimage.build.date=Tue Jun 20 17:53:19 KST 2017
-ro.bootimage.build.date.utc=1497948799
-ro.bootimage.build.fingerprint=lge/lucye_nao_us/lucye:7.0/NRD90U/171711753c9cd:user/release-keys
+ro.bootimage.build.date=Tue Jul 25 15:49:55 KST 2017
+ro.bootimage.build.date.utc=1500965395
+ro.bootimage.build.fingerprint=lge/lucye_nao_us/lucye:7.0/NRD90U/172061549d102:user/release-keys
 
