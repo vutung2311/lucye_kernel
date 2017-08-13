@@ -1874,11 +1874,14 @@ static int ext4_setup_super(struct super_block *sb, struct ext4_super_block *es,
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	int res = 0;
 
+#if 0
+	/* [FIXME] Skip to check revision and force recover it */
 	if (le32_to_cpu(es->s_rev_level) > EXT4_MAX_SUPP_REV) {
 		ext4_msg(sb, KERN_ERR, "revision level too high, "
 			 "forcing read-only mode");
 		res = MS_RDONLY;
 	}
+#endif
 	if (read_only)
 		goto done;
 	if (!(sbi->s_mount_state & EXT4_VALID_FS))
