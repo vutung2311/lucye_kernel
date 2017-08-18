@@ -2295,6 +2295,7 @@ enum {
 	Opt_err_cont,
 	Opt_err_panic,
 	Opt_err_ro,
+	Opt_utf8,
 	Opt_err,
 #if EXFAT_CONFIG_DISCARD
 	Opt_discard,
@@ -2316,6 +2317,7 @@ static const match_table_t exfat_tokens = {
 	{Opt_err_cont, "errors=continue"},
 	{Opt_err_panic, "errors=panic"},
 	{Opt_err_ro, "errors=remount-ro"},
+	{Opt_utf8,"utf8"},
 #if EXFAT_CONFIG_DISCARD
 	{Opt_discard, "discard"},
 #endif
@@ -2411,6 +2413,8 @@ static int parse_options(char *options, int silent, int *debug,
 			break;
 		case Opt_debug:
 			*debug = 1;
+			break;
+		case Opt_utf8:
 			break;
 #if EXFAT_CONFIG_DISCARD
 		case Opt_discard:
