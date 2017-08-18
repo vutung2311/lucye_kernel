@@ -1616,7 +1616,7 @@ static int fg_check_ima_exception(struct fg_chip *chip, bool check_hw_sts)
 		pr_err("IMA exception bit set, exp_sts=%x\n", exp_sts);
 		run_err_clr_seq = true;
 	}
- 
+
 	if (run_err_clr_seq) {
 		ret = fg_run_iacs_clear_sequence(chip);
 		if (!ret)
@@ -2112,7 +2112,7 @@ static int fg_interleaved_mem_read(struct fg_chip *chip, u8 *val, u16 address,
 		retry = false;
 		goto retry;
 	}
-	
+
 	mutex_unlock(&chip->rw_lock);
  exit:
 	fg_relax(&chip->memif_wakeup_source);
@@ -2180,7 +2180,7 @@ static int fg_interleaved_mem_write(struct fg_chip *chip, u8 *val, u16 address,
 	ret = fg_masked_write(chip, MEM_INTF_CFG(chip), IMA_REQ_ACCESS, 0, 1);
 	if (ret)
 		pr_err("failed to reset IMA access bit ret = %d\n", ret);
-	
+
 	if (retry) {
 		retry = false;
 		goto retry;
@@ -3262,7 +3262,7 @@ try_again:
 		 (chip->vint_err_pct / 100 < VINT_ERR_FOR_FG_RESET * (-1))){
 		vint_err_count++;
 
-		pr_info("vint_err %d, count %d\n", 
+		pr_info("vint_err %d, count %d\n",
 			chip->vint_err_pct / 100, vint_err_count);
 
 		if (vint_err_count >= CHECK_VINT_ERR_COUNT) {
@@ -7881,7 +7881,7 @@ static void check_empty_work(struct work_struct *work)
 		msoc = get_monotonic_soc_raw(chip);
 
 		if (fg_debug_mask & FG_STATUS)
-			pr_info("Vbatt_low: %d, msoc: %d\n", vbatt_low_sts, 
+			pr_info("Vbatt_low: %d, msoc: %d\n", vbatt_low_sts,
 					msoc);
 		if (vbatt_low_sts || (msoc == 0))
 		        chip->soc_empty = true;
@@ -8703,6 +8703,8 @@ static int fg_init_irqs(struct fg_chip *chip)
 				       chip->soc_irq[FULL_SOC].irq, rc);
 				return rc;
 			}
+			enable_irq_wake(chip->soc_irq[FULL_SOC].irq);
+			chip->full_soc_irq_enabled = true;
 
 			if (!chip->use_vbat_low_empty_soc) {
 				rc = devm_request_irq(chip->dev,
