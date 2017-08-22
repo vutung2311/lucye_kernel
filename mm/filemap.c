@@ -36,7 +36,7 @@
 #include <linux/cleancache.h>
 #include <linux/rmap.h>
 #include "internal.h"
-#include "../fs/sreadahead_prof.h"
+//#include "../fs/sreadahead_prof.h"
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/filemap.h>
@@ -1907,7 +1907,7 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		*
 		* matia.kim@lge.com 20130612
 		*/
-		sreadahead_prof(file, 0, 0);
+		//sreadahead_prof(file, 0, 0);
 		/* LGE_CHANGE_E */
 		mem_cgroup_count_vm_event(vma->vm_mm, PGMAJFAULT);
 		ret = VM_FAULT_MAJOR;

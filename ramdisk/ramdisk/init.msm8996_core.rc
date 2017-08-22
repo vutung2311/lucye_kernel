@@ -135,7 +135,7 @@ on post-fs
 
 # LGE_CHANGE_START
     # execute sreadahead daemon to reduce boot-time
-    start sreadahead
+    # start sreadahead
 # LGE_CHANGE_END
 
 on post-fs-data
@@ -156,6 +156,7 @@ service sreadahead-check /sbin/sreadahead_check
     class main
     user root
     group root
+    disabled
     oneshot
     seclabel u:r:sreadahead-check:s0
 # LGE_CHANGE_END
