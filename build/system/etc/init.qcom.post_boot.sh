@@ -1903,7 +1903,7 @@ case "$target" in
         #echo 1 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
         #echo 81250 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
         # configure governor settings for little cluster
-        echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        echo "sched" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
         #echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
         #echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_migration_notif
         #echo 19000 1300000:39000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
@@ -1919,7 +1919,7 @@ case "$target" in
         # online CPU2
         echo 1 > /sys/devices/system/cpu/cpu2/online
         # configure governor settings for big cluster
-        echo "schedutil" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+        echo "sched" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
         #echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
         #echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_migration_notif
         #echo "19000 1100000:39000 1600000:19000 2100000:79000" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
