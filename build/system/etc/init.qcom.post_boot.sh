@@ -1899,39 +1899,18 @@ case "$target" in
         bcl_soc_hotplug_mask=`cat /sys/devices/soc/soc:qcom,bcl/hotplug_soc_mask`
         echo 0 > /sys/devices/soc/soc:qcom,bcl/hotplug_soc_mask
         echo -n enable > /sys/devices/soc/soc:qcom,bcl/mode
-        # Enable Adaptive LMK
-        #echo 1 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
-        #echo 81250 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
         # configure governor settings for little cluster
-        echo "sched" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-        #echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
-        #echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_migration_notif
-        #echo 19000 1300000:39000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
-        #echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
-        #echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
-        #echo 768000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
-        #echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy
-        #echo 80 1300000:95 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
-        #echo 19000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
-        #echo 79000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
-        #echo 300000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-        #echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/ignore_hispeed_on_notif
+        echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        # EAS: Adjust schedutil settings
+        echo 6000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us
+        echo 1000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us
         # online CPU2
         echo 1 > /sys/devices/system/cpu/cpu2/online
         # configure governor settings for big cluster
-        echo "sched" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-        #echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
-        #echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_migration_notif
-        #echo "19000 1100000:39000 1600000:19000 2100000:79000" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
-        #echo 90 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/go_hispeed_load
-        #echo 20000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
-        #echo 1056000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/hispeed_freq
-        #echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/io_is_busy
-        #echo "90 1200000:95 1700000:70 2100000:95" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/target_loads
-        #echo 19000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time
-        #echo 79000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/max_freq_hysteresis
-        #echo 300000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
-        #echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/ignore_hispeed_on_notif
+        echo "schedutil" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+        # EAS: Adjust schedutil settings
+        echo 6000 > /sys/devices/system/cpu/cpu2/cpufreq/schedutil/down_rate_limit_us
+        echo 2000 > /sys/devices/system/cpu/cpu2/cpufreq/schedutil/up_rate_limit_us
         # re-enable thermal and BCL hotplug
         echo 1 > /sys/module/msm_thermal/core_control/enabled
         echo -n disable > /sys/devices/soc/soc:qcom,bcl/mode
@@ -1942,19 +1921,6 @@ case "$target" in
         echo 0 > /sys/module/msm_thermal/core_control/force_unmask
         # plugin remaining big cluster
         echo 1 > /sys/devices/system/cpu/cpu3/online
-        # input boost configuration
-        #echo "0:960000 2:1036800" > /sys/module/cpu_boost/parameters/input_boost_freq
-        #echo 40 > /sys/module/cpu_boost/parameters/input_boost_ms
-        #echo "0:960000 2:1036800" > /sys/module/cpu_boost/parameters/multi_boost_freq
-        # Setting b.L scheduler parameters
-        #echo 0 > /proc/sys/kernel/sched_boost
-        #echo 1 > /proc/sys/kernel/sched_migration_fixup
-        #echo 45 > /proc/sys/kernel/sched_downmigrate
-        #echo 45 > /proc/sys/kernel/sched_upmigrate
-        #echo 400000 > /proc/sys/kernel/sched_freq_inc_notify
-        #echo 400000 > /proc/sys/kernel/sched_freq_dec_notify
-        #echo 3 > /proc/sys/kernel/sched_spill_nr_run
-        #echo 100 > /proc/sys/kernel/sched_init_task_load
         # Enable bus-dcvs
         for cpubw in /sys/class/devfreq/*qcom,cpubw*
         do
@@ -2007,13 +1973,6 @@ case "$target" in
 	else
 		start fg-dump
 	fi
-
-	# Change Contexts & Perms of Interative nodes
-	chown -h system.system /sys/devices/system/cpu/cpu0/cpufreq/interactive/cancun_gov_enable
-	chmod -h 644 /sys/devices/system/cpu/cpu0/cpufreq/interactive/cancun_gov_enable
-	chown -h system.system /sys/devices/system/cpu/cpu0/cpufreq/interactive/cancun_is_game
-	chmod -h 644 /sys/devices/system/cpu/cpu0/cpufreq/interactive/cancun_is_game
-	restorecon -R  /sys/devices/system/cpu/cpu0/cpufreq/interactive/
 
 	echo N > /sys/module/lpm_levels/parameters/sleep_disabled
         # Starting io prefetcher service
