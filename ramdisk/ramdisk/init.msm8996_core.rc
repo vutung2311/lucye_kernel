@@ -96,19 +96,19 @@ on post-fs
     # 2. adding 'restorecon_recursive /sys/kernel/debug' on boot_completed in system/core/rootdir/init.rc
     # 3. execute build and download
     # 4. adding following debugfs nodes which are found from audit denied kernel boot log
-    restorecon_recursive /sys/kernel/debug/sreadahead
+    #restorecon_recursive /sys/kernel/debug/sreadahead
     restorecon /sys/kernel/debug/clk/debug_suspend
     restorecon_recursive /sys/kernel/debug/rmt_storage
     # trace event of init.msm8996.crash.sh
     restorecon /sys/module/msm_rtb/parameters/filter
     restorecon /sys/kernel/debug/tracing/tracing_on
-    restorecon /sys/kernel/debug/tracing/events/sched/sched_cpu_hotplug/enable
-    restorecon /sys/kernel/debug/tracing/events/sched/sched_cpu_load/enable
-    restorecon /sys/kernel/debug/tracing/events/sched/sched_enq_deq_task/enable
-    restorecon /sys/kernel/debug/tracing/events/sched/sched_load_balance/enable
+    #restorecon /sys/kernel/debug/tracing/events/sched/sched_cpu_hotplug/enable
+    #restorecon /sys/kernel/debug/tracing/events/sched/sched_cpu_load/enable
+    #restorecon /sys/kernel/debug/tracing/events/sched/sched_enq_deq_task/enable
+    #restorecon /sys/kernel/debug/tracing/events/sched/sched_load_balance/enable
     restorecon /sys/kernel/debug/tracing/events/sched/sched_migrate_task/enable
     restorecon /sys/kernel/debug/tracing/events/sched/sched_switch/enable
-    restorecon /sys/kernel/debug/tracing/events/sched/sched_task_load/enable
+    #restorecon /sys/kernel/debug/tracing/events/sched/sched_task_load/enable
     restorecon /sys/kernel/debug/tracing/events/sched/sched_wakeup/enable
     restorecon /sys/kernel/debug/tracing/events/sched/sched_wakeup_new/enable
     restorecon /sys/kernel/debug/tracing/events/workqueue/workqueue_execute_start/enable

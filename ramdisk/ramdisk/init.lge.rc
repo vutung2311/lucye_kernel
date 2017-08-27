@@ -140,21 +140,21 @@ on post-fs-data
     restorecon_recursive /mpt
     restorecon /persist
     restorecon_recursive /persist
-    restorecon /cust
-    restorecon_recursive /cust
-    restorecon /eri
-    restorecon_recursive /eri
-    restorecon /vzw/quality
-    restorecon_recursive /vzw/quality
-    restorecon /carrier
-    restorecon_recursive /carrier
-    restorecon /ve
-    restorecon_recursive /ve
-    restorecon /OneSeg
-    restorecon_recursive /OneSeg
+    #restorecon /cust
+    #restorecon_recursive /cust
+    #restorecon /eri
+    #restorecon_recursive /eri
+    #restorecon /vzw/quality
+    #restorecon_recursive /vzw/quality
+    #restorecon /carrier
+    #restorecon_recursive /carrier
+    #restorecon /ve
+    #restorecon_recursive /ve
+    #restorecon /OneSeg
+    #restorecon_recursive /OneSeg
     restorecon /dev/iwland
-    restorecon /data/preload
-    restorecon_recursive /data/preload
+    #restorecon /data/preload
+    #restorecon_recursive /data/preload
 
     #Widevine firmware copy
     exec /system/bin/cpfirmware widevine /persist-lg/firmware

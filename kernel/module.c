@@ -1145,10 +1145,9 @@ static int check_version(Elf_Shdr *sechdrs,
 	unsigned int i, num_versions;
 	struct modversion_info *versions;
 
-	/* Allow loading of proprietary kernel modules */
-	if (!strncmp("lgecrypto_", mod->name, 10))
+	/* Allow loading of LG's proprietary kernel modules */
+	if (strcmp(mod->name, "lgecrypto_module") == 0)
  		return 1;
-
 
 	/* Exporting module didn't supply crcs?  OK, we're already tainted. */
 	if (!crc)
@@ -3280,7 +3279,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	mod->sig_ok = info->sig_ok;
 	if (!mod->sig_ok) {
 		pr_notice_once("%s: module verification failed: signature "
-			       "and/or  required key missing - tainting "
+			       "and/or required key missing - tainting "
 			       "kernel\n", mod->name);
 		add_taint_module(mod, TAINT_UNSIGNED_MODULE, LOCKDEP_STILL_OK);
 	}
