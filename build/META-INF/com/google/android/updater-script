@@ -10,11 +10,11 @@ package_extract_dir("system", "/system");
 run_program("/sbin/mv", "/system/lib/modules/texfat.ko", "/system/lib/modules/texfat.ko.old");
 set_progress(0.7);
 
-ui_print(" - Tuning file systems...");
-run_program("/sbin/fstrim", "-v", "/system");
-run_program("/sbin/fstrim", "-v", "/data");
-run_program("/sbin/fstrim", "-v", "/cache");
-set_progress(0.8);
+#ui_print(" - Tuning file systems...");
+#run_program("/sbin/fstrim", "-v", "/system");
+#run_program("/sbin/fstrim", "-v", "/data");
+#run_program("/sbin/fstrim", "-v", "/cache");
+#set_progress(0.8);
 
 ui_print(" - Flashing kernel...");
 package_extract_file("boot.img", "/dev/block/bootdevice/by-name/boot");
