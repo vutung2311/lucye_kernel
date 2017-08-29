@@ -67,7 +67,7 @@ FUNC_BUILD_ZIP()
 	cd $RDIR
 	rm -f $RDIR/build/boot.img $RDIR/build/system/lib/modules/*.ko
 	mv -f $RDIR/ramdisk/image-new.img $RDIR/build/boot.img
-	find -name "*.ko" -not -path "./build/system/lib/modules*" -not -path "./ramdisk/ramdisk*" -exec cp {} $RDIR/build/system/lib/modules \;
+	find -name "*.ko" -not -path "./build/system/lib/modules*" -not -path "./ramdisk/ramdisk*" -exec mv {} $RDIR/build/system/lib/modules \;
 	cd $RDIR/build
 	zip kernel_package.zip -r -FS boot.img system/ META-INF
 
