@@ -165,6 +165,13 @@ static int chg_set_property(struct power_supply *psy,
 		dev->is_present = val->intval;
 		DEBUG("%s: is_present(%d)\n", __func__, dev->is_present);
 
+#ifdef CONFIG_LGE_USB_MOISTURE_DETECT
+		if (dev->mode == DUAL_ROLE_PROP_MODE_FAULT) {
+			tcpm_cc_swing_timer(0, dev->is_present ? false : true);
+			break;
+		}
+#endif
+
 		if (dev->mode == DUAL_ROLE_PROP_MODE_NONE) {
 			if (val->intval) {
 				PRINT("power on by charger\n");
@@ -176,6 +183,7 @@ static int chg_set_property(struct power_supply *psy,
 				}
 			}
 		}
+
 		break;
 
 	default:

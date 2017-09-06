@@ -534,9 +534,6 @@ static irqreturn_t tusb422_event_handler(int irq, void *data)
 	struct tusb422_pwr_delivery *tusb422_pwr = data;
 
 #if defined(CONFIG_WAKELOCK) && defined(CONFIG_LGE_USB_TYPE_C)
-#ifdef CONFIG_LGE_USB_MOISTURE_DETECT
-	if (!tcpm_is_cc_fault(0))
-#endif
 	wake_lock_timeout(&tusb422_pd->attach_wakelock,
 			  msecs_to_jiffies(WAKE_LOCK_TIMEOUT_MS));
 #endif
@@ -929,9 +926,6 @@ static enum hrtimer_restart tusb422_timer_tasklet(struct hrtimer *hrtimer)
 	struct tusb422_pwr_delivery *tusb422_pwr = container_of(hrtimer, struct tusb422_pwr_delivery, timer);
 
 #if defined(CONFIG_WAKELOCK) && defined(CONFIG_LGE_USB_TYPE_C)
-#ifdef CONFIG_LGE_MOISTURE_DETECT
-	if (!tcpm_is_cc_fault(0))
-#endif
 	wake_lock_timeout(&tusb422_pwr->attach_wakelock,
 			  msecs_to_jiffies(WAKE_LOCK_TIMEOUT_MS));
 #endif
@@ -1075,6 +1069,9 @@ static int tusb422_i2c_probe(struct i2c_client *client,
 	}
 #endif
 
+#ifdef CONFIG_LGE_USB_TYPE_C
+	tusb422_sw_reset(0);
+#endif
 	if (!tusb422_is_present(0)) {
 		dev_err(dev, "%s: no TUSB422 device found\n", __func__);
 		ret = -ENODEV;
@@ -1132,9 +1129,6 @@ static int tusb422_i2c_probe(struct i2c_client *client,
 
 	usb_pd_print_version();
 
-#ifdef CONFIG_LGE_USB_TYPE_C
-	tusb422_sw_reset(0);
-#endif
 	ret = tusb422_tcpm_init(tusb422_pd);
 	if (ret == 0)
 		ret = tusb422_pd_init(tusb422_pd);
@@ -1228,32 +1222,6 @@ static int tusb422_remove(struct i2c_client *client)
 	return 0;
 }
 
-#ifdef CONFIG_LGE_USB_MOISTURE_DETECT
-int tusb422_suspend(struct i2c_client *client, pm_message_t mesg)
-{
-	DEBUG("%s\n", __func__);
-
-	if (tcpm_is_cc_fault(0))
-		tcpm_cc_fault_suspend(0);
-
-	return 0;
-}
-
-int tusb422_resume(struct i2c_client *client)
-{
-	DEBUG("%s\n", __func__);
-
-	if (tcpm_is_cc_fault(0)) {
-		wake_lock_timeout(&tusb422_pd->attach_wakelock,
-				  msecs_to_jiffies(8000));
-
-		tcpm_cc_fault_resume(0);
-	}
-
-	return 0;
-}
-#endif
-
 static const struct i2c_device_id tusb422_id[] = {
 	{ TUSB422_I2C_NAME, 0},
 	{}
@@ -1276,10 +1244,6 @@ static struct i2c_driver tusb422_i2c_driver = {
 	},
 	.probe = tusb422_i2c_probe,
 	.remove = tusb422_remove,
-#ifdef CONFIG_LGE_USB_MOISTURE_DETECT
-	.suspend = tusb422_suspend,
-	.resume = tusb422_resume,
-#endif
 	.id_table = tusb422_id,
 };
 module_i2c_driver(tusb422_i2c_driver);

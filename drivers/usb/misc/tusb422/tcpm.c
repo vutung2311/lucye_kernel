@@ -81,7 +81,6 @@
 #define T_CC_OV_CHECK_MS		500
 
 #define T_CC_SWING_TIMEOUT_MS		T_CC_DEBOUNCE_MS
-#define T_CC_SWING_CHECK_MS		6000
 #define CC_SWING_THRESHOLD		((T_CC_DEBOUNCE_MS / T_PD_DEBOUNCE_MS) * 2)
 #endif
 
@@ -570,6 +569,44 @@ static void tcpm_set_state(tcpc_device_t *dev, tcpc_state_t new_state)
 }
 
 #ifdef CONFIG_LGE_USB_MOISTURE_DETECT
+static void timeout_cc_swing(unsigned int port);
+
+static unsigned int cc_swing_get_timeout_ms(unsigned int port)
+{
+	tcpc_device_t *dev = tcpm_get_device(port);
+	unsigned int timeout_tbl[][2] = {
+		/* recheck_cnt upper, timeout_ms */
+		{1, 6 * 1000},			// 6s
+		{6, 60 * 1000},			// 60s
+		{12, 10 * 60 * 1000},		// 10m
+		{UINT_MAX, 30 * 60 * 1000},	// 30m
+	};
+	int i;
+
+	for (i = 0; i < (sizeof(timeout_tbl) / sizeof(*timeout_tbl)); i++) {
+		if (dev->cc_swing_recheck_cnt <= timeout_tbl[i][0])
+			return timeout_tbl[i][1];
+	}
+
+	return (30 * 60 * 1000);
+}
+
+static void cc_swing_timer_start(unsigned int port, unsigned int timeout_ms)
+{
+	tcpc_device_t *dev = tcpm_get_device(port);
+
+	PRINT("%s: %u ms\n", __func__, timeout_ms);
+
+	tusb422_lfo_timer_cancel(&dev->timer2);
+
+	dev->cc_swing_timeout = jiffies + msecs_to_jiffies(timeout_ms);
+	dev->cc_swing_recheck_timeout = CURRENT_TIME;
+	timespec_add_ns(&dev->cc_swing_recheck_timeout, ((u64)timeout_ms) * 1000000);
+	tusb422_lfo_timer_start(&dev->timer2,
+				timeout_ms > U16_MAX ? U16_MAX : (uint16_t)timeout_ms,
+				timeout_cc_swing);
+}
+
 static bool tcpm_is_cc_swing(unsigned int port)
 {
 	tcpc_device_t *dev = tcpm_get_device(port);
@@ -590,6 +627,7 @@ static bool tcpm_is_cc_swing(unsigned int port)
 	if (dev->state == TCPC_STATE_CC_FAULT_SWING && dev->cc_swing_cnt > CC_SWING_THRESHOLD)
 	{
 		DEBUG("%s: CC swing is already detected.\n", __func__);
+		cc_swing_timer_start(port, cc_swing_get_timeout_ms(port));		
 		return true;
 	}
 
@@ -642,11 +680,16 @@ static bool tcpm_is_cc_swing(unsigned int port)
 
 			tcpc_write8(port, TCPC_REG_ROLE_CTRL, tcpc_reg_role_ctrl_set(false, dev->rp_val, CC_OPEN, CC_OPEN));
 
+			PRINT("%s: CC swing is detected.\n", __func__);			
 			if (dev->state != TCPC_STATE_CC_FAULT_SWING)
 			{
 				PRINT("%s: CC swing is detected.\n", __func__);
 				tcpm_set_state(dev, TCPC_STATE_CC_FAULT_SWING);
 			}
+			else
+			{
+				cc_swing_timer_start(port, cc_swing_get_timeout_ms(port));
+			}			
 			return true;
 		}
 	}
@@ -669,9 +712,28 @@ static void timeout_cc_swing(unsigned int port)
 {
 	tcpc_device_t *dev = tcpm_get_device(port);
 	unsigned int cc1, cc2;
+	struct timespec timeout_remain;
+	unsigned int timeout_remain_ms;
 
-	if (!tcpm_is_cc_swing(port))
+	timeout_remain = timespec_sub(dev->cc_swing_recheck_timeout, CURRENT_TIME);
+	DEBUG("%s: timeout_remain: tv_sec(%ld), tvnsec(%ld)\n", __func__, timeout_remain.tv_sec, timeout_remain.tv_nsec);
+	if (timespec_valid(&timeout_remain))
 	{
+		timeout_remain_ms = (timeout_remain.tv_sec * 1000) + (timeout_remain.tv_nsec / 1000000);
+		DEBUG("%s: timeout_remain_ms: (%u)\n", __func__, timeout_remain_ms);
+		if (timeout_remain_ms > T_CC_SWING_TIMEOUT_MS)
+		{
+			PRINT("%s: timeout remain: %u ms\n", __func__, timeout_remain_ms);
+			cc_swing_timer_start(port, timeout_remain_ms);
+			return;
+		}
+	}
+
+	if (dev->cc_swing_cnt == 0)
+	{
+		tcpc_read8(port, TCPC_REG_CC_STATUS, &dev->cc_status);
+		PRINT("%s CC status = 0x%x\n", __func__, dev->cc_status);
+		
 		cc1 = TCPC_CC1_STATE(dev->cc_status);
 		cc2 = TCPC_CC2_STATE(dev->cc_status);
 
@@ -690,7 +752,7 @@ static void timeout_cc_swing(unsigned int port)
 		}
 	}
 
-	DEBUG("%s: CC is not detached.\n", __func__);
+	PRINT("%s: CC is not detached. cc_swing_cnt(%d)\n", __func__, dev->cc_swing_cnt);
 
 	dev->cc_swing_cnt = 0;
 
@@ -712,8 +774,35 @@ static void timeout_cc_swing(unsigned int port)
 	// Look for connection.
 	tcpc_write8(port, TCPC_REG_COMMAND, TCPC_CMD_SRC_LOOK4CONNECTION);
 
-	dev->cc_swing_timeout = jiffies + msecs_to_jiffies(T_CC_SWING_CHECK_MS);
-	timer_start(&dev->timer, T_CC_SWING_CHECK_MS, timeout_cc_swing);
+	if (dev->cc_swing_recheck_cnt < UINT_MAX)
+		dev->cc_swing_recheck_cnt++;
+	PRINT("%s: CC swing recheck count: %u\n", __func__, dev->cc_swing_recheck_cnt);
+	cc_swing_timer_start(port, cc_swing_get_timeout_ms(port));
+}
+
+void tcpm_cc_swing_timer(unsigned int port, bool enable)
+{
+	tcpc_device_t *dev = tcpm_get_device(port);
+
+	if (dev->state != TCPC_STATE_CC_FAULT_SWING)
+		return;
+
+	tusb422_lfo_timer_cancel(&dev->timer2);
+
+	if (enable)
+	{
+		dev->cc_swing_cnt = CC_SWING_THRESHOLD;
+		dev->cc_swing_recheck_timeout = ((struct timespec){0, 0});
+		dev->cc_swing_recheck_cnt = 0;
+		cc_swing_timer_start(port, T_CC_SWING_TIMEOUT_MS);
+	}
+	else
+	{
+		// Mask cc status alert.
+		tcpc_modify16(port, TCPC_REG_ALERT_MASK, TCPC_ALERT_CC_STATUS, 0);
+
+		tcpc_write8(port, TCPC_REG_ROLE_CTRL, tcpc_reg_role_ctrl_set(false, dev->rp_val, CC_OPEN, CC_OPEN));
+	}
 }
 
 static void timeout_cc_ov(unsigned int port)
@@ -808,46 +897,6 @@ void tcpm_cc_fault_test(unsigned int port, bool enable)
 
 			TCPC_POLLING_DELAY();
 		}
-	}
-}
-
-bool tcpm_is_cc_fault(unsigned int port)
-{
-	tcpc_device_t *dev = &tcpc_dev[port];
-	return IS_STATE_CC_FAULT(dev->state);
-}
-
-void tcpm_cc_fault_suspend(unsigned int port)
-{
-	tcpc_device_t *dev = &tcpc_dev[port];
-
-	PRINT("%s: %s\n", __func__, tcstate2string[dev->state]);
-
-	switch (dev->state) {
-	case TCPC_STATE_CC_FAULT_SWING:
-	case TCPC_STATE_CC_FAULT_OV:
-		timer_cancel(&dev->timer);
-		break;
-	default:
-		break;
-	}
-}
-
-void tcpm_cc_fault_resume(unsigned int port)
-{
-	tcpc_device_t *dev = &tcpc_dev[port];
-
-	PRINT("%s: %s\n", __func__, tcstate2string[dev->state]);
-
-	switch (dev->state) {
-	case TCPC_STATE_CC_FAULT_SWING:
-		timeout_cc_swing(port);
-		break;
-	case TCPC_STATE_CC_FAULT_OV:
-		timeout_cc_ov(port);
-		break;
-	default:
-		break;
 	}
 }
 #endif /* CONFIG_LGE_USB_MOISTURE_DETECT */
@@ -2102,7 +2151,10 @@ void tcpm_connection_state_machine(unsigned int port)
 			tcpm_notify_conn_state(port, dev->state);
 
 			PRINT("CC_SWING: Waiting until CC is detached.\n");
-			timeout_cc_swing(dev->port);
+			dev->cc_swing_cnt = CC_SWING_THRESHOLD;
+			dev->cc_swing_recheck_timeout = ((struct timespec){0, 0});
+			dev->cc_swing_recheck_cnt = 0;
+			cc_swing_timer_start(port, T_CC_SWING_TIMEOUT_MS);
 			break;
 #endif
 

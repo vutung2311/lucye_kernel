@@ -100,9 +100,17 @@ bool tusb422_is_present(unsigned int port)
 
 	// Read VID/PID/DID.
 	tcpc_read16(port, TCPC_REG_VENDOR_ID, &vid);
+#ifdef CONFIG_LGE_USB_TYPE_C
+	PRINT("VID: 0x%04x\n", vid);
+#else
 	INFO("VID: 0x%04x\n", vid);
+#endif
 	tcpc_read16(port, TCPC_REG_PRODUCT_ID, &pid);
+#ifdef CONFIG_LGE_USB_TYPE_C
+	PRINT("PID: 0x%04x\n", pid);
+#else
 	INFO("PID: 0x%04x\n", pid);
+#endif
 
 	return ((vid != TI_VID) || (pid != TI_PID)) ? false : true;
 }
@@ -254,6 +262,11 @@ void tusb422_pd_reset(unsigned int port)
 void tusb422_sw_reset(unsigned int port)
 {
 	uint8_t data;
+
+#ifdef CONFIG_LGE_USB_TYPE_C
+	// Set pgage 0
+	tcpc_write8(0, 0xFF, 0);
+#endif
 
 	// Perform global reset (write 0, then 1).
 	tcpc_read8(port, TUSB422_REG_CC_GEN_CTRL, &data);

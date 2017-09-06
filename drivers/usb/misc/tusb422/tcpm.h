@@ -46,6 +46,10 @@
     #include <stdint.h>
 #endif
 
+#ifdef CONFIG_LGE_USB_MOISTURE_DETECT
+#include <linux/time.h>
+#endif
+
 /*
 * Macros and definitions
 */
@@ -162,11 +166,13 @@ typedef struct
 	uint8_t             vconn_ocp_cnt;
 #ifdef CONFIG_LGE_USB_TYPE_C
 	bool                debug_accessory_mode;
+#ifdef CONFIG_LGE_USB_MOISTURE_DETECT	
 	unsigned long       cc_swing_timeout;
 	uint8_t             cc_swing_cnt;
-#endif
-#ifdef CONFIG_LGE_USB_MOISTURE_DETECT
+	struct timespec     cc_swing_recheck_timeout;
+	unsigned int        cc_swing_recheck_cnt;
 	bool                moisture_detect_disable;
+#endif
 #endif
 } tcpc_device_t;
 
@@ -269,10 +275,8 @@ void tcpm_snk_swap_standby(unsigned int port);
 void tcpm_register_dump(unsigned int port);
 
 #ifdef CONFIG_LGE_USB_TYPE_C
+void tcpm_cc_swing_timer(unsigned int port, bool enable);
 void tcpm_cc_fault_test(unsigned int port, bool enable);
-bool tcpm_is_cc_fault(unsigned int port);
-void tcpm_cc_fault_suspend(unsigned int port);
-void tcpm_cc_fault_resume(unsigned int port);
 #endif
 
 #endif //__TCPM_H__
