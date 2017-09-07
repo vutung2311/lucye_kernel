@@ -2,13 +2,13 @@
  * Linux cfg80211 driver
  *
  * Copyright (C) 1999-2017, Broadcom Corporation
- * 
+ *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
  * available at http://www.broadcom.com/licenses/GPLv2.php, with the
  * following added to such license:
- * 
+ *
  *      As a special exception, the copyright holders of this software give you
  * permission to link this software with independent modules, and to copy and
  * distribute the resulting executable under terms of your choice, provided that
@@ -16,7 +16,7 @@
  * the license of that module.  An independent module is a module which is not
  * derived from this software.  The special exception does not apply to any
  * modifications of the software.
- * 
+ *
  *      Notwithstanding the above, under no circumstances may you combine this
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
@@ -1094,10 +1094,13 @@ static void wl_scan_timeout_dbg_clear(void);
 static void wl_scan_timeout_dbg_set(void)
 {
 	WL_ERR(("Enter \n"));
+#if defined(DHD_DEBUG)
 	prev_dhd_console_ms = dhd_console_ms;
+#endif
 	prev_wl_dbg_level = wl_dbg_level;
-
+#if defined(DHD_DEBUG)
 	dhd_console_ms = 1;
+#endif	
 	wl_dbg_level |= (WL_DBG_ERR | WL_DBG_P2P_ACTION | WL_DBG_SCAN);
 
 	wl_scan_timeout_dbg_enabled = 1;
@@ -1105,7 +1108,9 @@ static void wl_scan_timeout_dbg_set(void)
 static void wl_scan_timeout_dbg_clear(void)
 {
 	WL_ERR(("Enter \n"));
+#if defined(DHD_DEBUG)
 	dhd_console_ms = prev_dhd_console_ms;
+#endif
 	wl_dbg_level = prev_wl_dbg_level;
 
 	wl_scan_timeout_dbg_enabled = 0;
@@ -1661,7 +1666,7 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 	s32 up = 1;
 	dhd_pub_t *dhd;
 	bool enabled;
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 #if defined(SUPPORT_AP_POWERSAVE)
 	dhd_pub_t *dhd;
@@ -1674,7 +1679,7 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 #ifdef PROP_TXSTATUS_VSDB
 #if defined(BCMSDIO)
 	dhd = (dhd_pub_t *)(cfg->pub);
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 #if defined(SUPPORT_AP_POWERSAVE)
 	dhd = (dhd_pub_t *)(cfg->pub);
@@ -1759,7 +1764,7 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 #if defined(BCMSDIO)
 		if (!dhd)
 			return ERR_PTR(-ENODEV);
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 		if (!cfg->p2p)
 			return ERR_PTR(-ENODEV);
@@ -1794,7 +1799,7 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 			}
 			cfg->wlfc_on = true;
 		}
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 
 
@@ -1999,7 +2004,7 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 				dhd_wlfc_deinit(dhd);
 				cfg->wlfc_on = false;
 			}
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 			/*
 			* Returns -ENODEV to upperlayer to indicate that DHD
@@ -2396,7 +2401,7 @@ static s32 wl_cfg80211_handle_ifdel(struct bcm_cfg80211 *cfg, wl_if_event_info *
 #if defined(BCMSDIO)
 	dhd_pub_t *dhd =  (dhd_pub_t *)(cfg->pub);
 	bool enabled;
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 
 	bssidx = if_event_info->bssidx;
@@ -2436,7 +2441,7 @@ static s32 wl_cfg80211_handle_ifdel(struct bcm_cfg80211 *cfg, wl_if_event_info *
 			dhd_wlfc_deinit(dhd);
 			cfg->wlfc_on = false;
 		}
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 	}
 
@@ -4795,7 +4800,7 @@ static bool wl_get_chan_isvht80(struct net_device *net, dhd_pub_t *dhd)
 
 	return isvht80;
 }
-#endif 
+#endif
 
 static s32
 wl_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
@@ -7664,7 +7669,7 @@ wl_cfg80211_set_channel(struct wiphy *wiphy, struct net_device *dev,
 	struct bcm_cfg80211 *cfg = wiphy_priv(wiphy);
 #if (defined(WL_VIRTUAL_APSTA) && defined(APSTA_RESTRICTED_CHANNEL))
 	dhd_pub_t *dhd =  (dhd_pub_t *)(cfg->pub);
-#endif 
+#endif
 
 	dev = ndev_to_wlc_ndev(dev, cfg);
 	_chan = ieee80211_frequency_to_channel(chan->center_freq);
@@ -9581,11 +9586,11 @@ exit:
 		dhd->op_mode &= ~DHD_FLAG_HOSTAP_MODE;
 #if defined(CUSTOMER_HW10) && defined(SOFTAP_TPUT_ENHANCE)
        set_softap_params(dhd);
-#endif        
+#endif
 #ifdef CUSTOMER_HW10
 		set_parallelscan(dhd);
 #endif /* CUSTOMER_HW10 */
-        
+
 
 
 	}
@@ -10310,7 +10315,7 @@ static s32 wl_setup_wiphy(struct wireless_dev *wdev, struct device *sdiofunc_dev
 		err = -ENODEV;
 		return err;
 	}
-#endif 
+#endif
 
 	wdev->wiphy =
 	    wiphy_new(&wl_cfg80211_ops, sizeof(struct bcm_cfg80211));
@@ -10416,7 +10421,7 @@ static s32 wl_setup_wiphy(struct wireless_dev *wdev, struct device *sdiofunc_dev
 		wdev->wiphy->flags |= WIPHY_FLAG_AP_PROBE_RESP_OFFLOAD;
 		wdev->wiphy->probe_resp_offload = 0;
 	}
-#endif 
+#endif
 #endif /* WL_SUPPORT_BACKPORTED_KPATCHES) || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 4, 0)) */
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3, 2, 0)) || defined(WL_COMPAT_WIRELESS)
@@ -12350,7 +12355,7 @@ wl_bss_connect_done(struct bcm_cfg80211 *cfg, struct net_device *ndev,
 	struct wl_security *sec = wl_read_prof(cfg, ndev, WL_PROF_SEC);
 #if (defined(ROAM_ENABLE) && defined(ROAM_AP_ENV_DETECTION))
 	dhd_pub_t *dhd = (dhd_pub_t *)(cfg->pub);
-#endif 
+#endif
 	s32 err = 0;
 	u8 *curbssid = wl_read_prof(cfg, ndev, WL_PROF_BSSID);
 	if (!sec) {
@@ -14618,7 +14623,7 @@ static s32 wl_init_priv(struct bcm_cfg80211 *cfg)
 	cfg->vsdb_mode = false;
 #if defined(BCMSDIO)
 	cfg->wlfc_on = false;
-#endif 
+#endif
 	cfg->roamoff_on_concurrent = true;
 	cfg->disable_roam_event = false;
 	cfg->cfgdev_bssidx = -1;
@@ -14854,7 +14859,7 @@ s32 wl_cfg80211_attach(struct net_device *ndev, void *context)
 	cfg->btcoex_info = wl_cfg80211_btcoex_init(cfg->wdev->netdev);
 	if (!cfg->btcoex_info)
 		goto cfg80211_attach_out;
-#endif 
+#endif
 #if defined(SUPPORT_RANDOM_MAC_SCAN)
 	cfg->random_mac_enabled = FALSE;
 #endif /* SUPPORT_RANDOM_MAC_SCAN */
@@ -14892,7 +14897,7 @@ void wl_cfg80211_detach(void *para)
 #if defined(COEX_DHCP)
 	wl_cfg80211_btcoex_deinit();
 	cfg->btcoex_info = NULL;
-#endif 
+#endif
 
 	wl_setup_rfkill(cfg, FALSE);
 #ifdef DEBUGFS_CFG80211
@@ -15430,7 +15435,7 @@ s32 wl_update_wiphybands(struct bcm_cfg80211 *cfg, bool notify)
 	s32 stbc_tx = 0;
 	s32 txbf_bfe_cap = 0;
 	s32 txbf_bfr_cap = 0;
-#endif 
+#endif
 	bool rollback_lock = false;
 	s32 bw_cap = 0;
 	s32 cur_band = -1;
@@ -15504,13 +15509,13 @@ s32 wl_update_wiphybands(struct bcm_cfg80211 *cfg, bool notify)
 			WL_ERR(("error reading txbf_bfr_cap (%d)\n", err));
 		}
 	}
-#endif 
+#endif
 
 	/* For nmode and vhtmode   check bw cap */
 	if (nmode ||
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 		vhtmode ||
-#endif 
+#endif
 		0) {
 		err = wldev_iovar_getint(dev, "mimo_bw_cap", &bw_cap);
 		if (unlikely(err)) {
@@ -15621,7 +15626,7 @@ s32 wl_update_wiphybands(struct bcm_cfg80211 *cfg, bool notify)
 					bands[index]->vht_cap.vht_mcs.rx_mcs_map,
 					bands[index]->vht_cap.vht_mcs.tx_mcs_map));
 			}
-#endif 
+#endif
 		}
 		else if (bandlist[i] == WLC_BAND_2G && __wl_band_2ghz.n_channels > 0) {
 			bands[IEEE80211_BAND_2GHZ] =
@@ -15785,7 +15790,7 @@ static s32 __wl_cfg80211_down(struct bcm_cfg80211 *cfg)
 				cfg->wlfc_on = false;
 			}
 		}
-#endif 
+#endif
 #endif /* PROP_TXSTATUS_VSDB */
 	}
 

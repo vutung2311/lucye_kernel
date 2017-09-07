@@ -5263,6 +5263,7 @@ void dhd_runtime_pm_disable(dhd_pub_t *dhdp)
 
 void dhd_runtime_pm_enable(dhd_pub_t *dhdp)
 {
+#if defined(DHD_DEBUG)	
 	if (dhd_console_ms) {
 		DHD_ERROR(("runtime_pm_enable is not allowed because dconpoll is enabled\n"));
 	} else if (dhd_runtimepm_ms <= 0) {
@@ -5271,6 +5272,7 @@ void dhd_runtime_pm_enable(dhd_pub_t *dhdp)
 		dhd_os_runtimepm_timer(dhdp, dhd_runtimepm_ms);
 		DHD_ERROR(("DHD Runtime PM Enabled \n"));
 	}
+#endif	
 }
 #endif /* DHD_PCIE_RUNTIMEPM */
 

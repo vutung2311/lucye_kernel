@@ -2341,7 +2341,7 @@ dhd_pno_set_for_gscan(dhd_pub_t *dhd, struct dhd_pno_gscan_params *gscan_params)
 		DHD_PNO(("nhotlist %d\n", gscan_params->nbssid_hotlist));
 		list_for_each_entry_safe(iter, next,
 		    &gscan_params->hotlist_bssid_list, list) {
-			char buffer_hotlist[64];
+			char __maybe_unused buffer_hotlist[64];
 
 			memcpy(&ptr->macaddr,
 			&iter->macaddr, ETHER_ADDR_LEN);
