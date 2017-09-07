@@ -199,12 +199,12 @@ on property:ro.build.product=msf3
 #    class main
 
 #CAPP_POWEROFF_ANI
-service shutdownanim /system/bin/shutdownanimation
-    class main
-    user graphics
-    group graphics system
-    disabled
-    oneshot
+#service shutdownanim /system/bin/shutdownanimation
+#    class main
+#    user graphics
+#    group graphics system
+#    disabled
+#    oneshot
 
 #CAPP_NFS
 service nfsserversetup /system/bin/nfsserversetup
